@@ -7,7 +7,7 @@ from pymongo import ReturnDocument
 router = APIRouter(prefix="/books",tags=["Book Management"])
 
 
-@router.put('/search_book/{book_id}', response_model=OutputSchema)
+@router.put('/update_book/{book_id}', response_model=OutputSchema)
 async def update_book(new_book: Book, book_id: int = Path(..., gt=0), collection: Any = Depends(get_db)):
     # book = search_book(database, search_id=book_id)
     updated_book = await collection.find_one_and_update(
@@ -21,7 +21,9 @@ async def update_book(new_book: Book, book_id: int = Path(..., gt=0), collection
         return {
             "message": f"Updated book {book_id}",
             "book_id": updated_book["book_id"],
-            "title": updated_book["title"]
+            "title": updated_book["title"],
+            "chapter_no": updated_book["chapter_no"],
+            "pg_no": updated_book["pg_no"]
         }
     else:
         raise HTTPException(status_code=404, detail=f"Book {book_id} not found in the database!")
@@ -34,7 +36,7 @@ async def delete_book(book_id: int = Path(..., gt=0), collection: Any = Depends(
     if deleted_book:
         # database.remove(book)
         return {
-            "message": f"Deleted {book_id} with {deleted_book["title"]} from the database!",
+            "message": f"Deleted {book_id} with Topic: '{deleted_book["title"]}' from the database!",
             "book_id": book_id,
             "title": deleted_book["title"]
         }
